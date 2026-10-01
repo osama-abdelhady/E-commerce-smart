@@ -1,0 +1,62 @@
+<header class="navbar">
+  <div class="page-container navbar-inner">
+    <button type="button" class="mobile-toggle" aria-label="Open menu" (click)="isMobileMenuOpen.set(true)">☰</button>
+
+    <a routerLink="/" class="logo">Aurelia<span>Suits</span></a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <a routerLink="/products" routerLinkActive="active">Shop</a>
+      @for (cat of categories(); track cat.id) {
+        <a [routerLink]="['/categories', cat.slug]">{{ cat.name }}</a>
+      }
+    </nav>
+
+    <form class="search-form" (submit)="submitSearch(); $event.preventDefault()">
+      <input
+        type="search"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+        name="q"
+        placeholder="Search products..."
+        aria-label="Search products"
+      />
+      <button type="submit" aria-label="Submit search">🔍</button>
+    </form>
+
+    <div class="nav-actions">
+      <a routerLink="/wishlist" class="icon-link" aria-label="Wishlist">
+        ♡
+        @if (wishlist.count() > 0) { <span class="badge">{{ wishlist.count() }}</span> }
+      </a>
+      <a routerLink="/cart" class="icon-link" aria-label="Cart">
+        🛍
+        @if (cart.itemCount() > 0) { <span class="badge">{{ cart.itemCount() }}</span> }
+      </a>
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/account" class="icon-link" aria-label="Account">👤</a>
+        <button type="button" class="text-link" (click)="logout()">Log out</button>
+      } @else {
+        <a routerLink="/auth/login" class="text-link">Log in</a>
+      }
+    </div>
+  </div>
+</header>
+
+@if (isMobileMenuOpen()) {
+  <div class="mobile-menu-overlay" (click)="isMobileMenuOpen.set(false)">
+    <div class="mobile-menu" (click)="$event.stopPropagation()">
+      <button type="button" (click)="isMobileMenuOpen.set(false)" aria-label="Close menu">✕</button>
+      <a routerLink="/products" (click)="isMobileMenuOpen.set(false)">Shop</a>
+      @for (cat of categories(); track cat.id) {
+        <a [routerLink]="['/categories', cat.slug]" (click)="isMobileMenuOpen.set(false)">{{ cat.name }}</a>
+      }
+      <a routerLink="/wishlist" (click)="isMobileMenuOpen.set(false)">Wishlist</a>
+      <a routerLink="/cart" (click)="isMobileMenuOpen.set(false)">Cart</a>
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/account" (click)="isMobileMenuOpen.set(false)">Account</a>
+      } @else {
+        <a routerLink="/auth/login" (click)="isMobileMenuOpen.set(false)">Log in</a>
+      }
+    </div>
+  </div>
+}

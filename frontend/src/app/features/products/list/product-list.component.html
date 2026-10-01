@@ -1,0 +1,72 @@
+<section class="page-container shop-page">
+  <div class="shop-header">
+    <h1>{{ filter().search ? 'Search results for "' + filter().search + '"' : 'All Products' }}</h1>
+    <button type="button" class="filter-toggle" (click)="isFilterOpen.set(!isFilterOpen())">
+      Filters {{ isFilterOpen() ? '▲' : '▼' }}
+    </button>
+  </div>
+
+  <div class="shop-layout">
+    <aside class="filters" [class.open]="isFilterOpen()">
+      <div class="filter-group">
+        <h4>Brand</h4>
+        @for (b of brands(); track b.id) {
+          <label class="checkbox-row">
+            <input type="checkbox" [checked]="isBrandChecked(b.slug)" (change)="onBrandToggle(b.slug, $any($event.target).checked)" />
+            {{ b.name }}
+          </label>
+        }
+      </div>
+
+      <div class="filter-group">
+        <h4>Price Range</h4>
+        <form class="price-form" #priceForm="ngForm" (ngSubmit)="onPriceFilter(minPriceInput.value, maxPriceInput.value)">
+          <input #minPriceInput type="number" placeholder="Min" [value]="filter().minPrice ?? ''" />
+          <span>–</span>
+          <input #maxPriceInput type="number" placeholder="Max" [value]="filter().maxPrice ?? ''" />
+          <button type="submit" class="btn-secondary">Go</button>
+        </form>
+      </div>
+
+      <div class="filter-group">
+        <label class="checkbox-row">
+          <input
+            type="checkbox"
+            [checked]="filter().inStockOnly"
+            (change)="updateQueryParams({inStockOnly: $any($event.target).checked || null})"
+          />
+          In stock only
+        </label>
+      </div>
+    </aside>
+
+    <div class="results">
+      <div class="results-bar">
+        <span class="muted">{{ totalItems() }} results</span>
+        <select [ngModel]="filter().sortBy" (ngModelChange)="onSortChange($event)" aria-label="Sort by">
+          <option value="NEWEST">Newest</option>
+          <option value="PRICE_ASC">Price: Low to High</option>
+          <option value="PRICE_DESC">Price: High to Low</option>
+          <option value="RATING">Top Rated</option>
+          <option value="POPULARITY">Best Selling</option>
+        </select>
+      </div>
+
+      @if (isLoading()) {
+        <app-loading-skeleton variant="product-grid" [count]="12"></app-loading-skeleton>
+      } @else if (products().length === 0) {
+        <app-empty-state
+          title="No products found"
+          description="Try adjusting your filters or search terms."
+        ></app-empty-state>
+      } @else {
+        <div class="product-grid">
+          @for (p of products(); track p.id) {
+            <app-product-card [product]="p" (wishlistToggled)="onWishlistToggle($event)"></app-product-card>
+          }
+        </div>
+        <app-pagination [currentPage]="filter().page ?? 0" [totalPages]="totalPages()" (pageChange)="onPageChange($event)"></app-pagination>
+      }
+    </div>
+  </div>
+</section>

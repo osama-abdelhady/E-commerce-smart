@@ -1,0 +1,49 @@
+<div class="header-row">
+  <h1>Coupons</h1>
+  <button type="button" class="btn-primary" (click)="isFormOpen.set(!isFormOpen())">
+    {{ isFormOpen() ? 'Cancel' : '+ New Coupon' }}
+  </button>
+</div>
+
+@if (isFormOpen()) {
+  <form class="coupon-form card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <label>Code <input type="text" formControlName="code" /></label>
+      <label>Type
+        <select formControlName="discountType">
+          <option value="PERCENTAGE">Percentage</option>
+          <option value="FIXED_AMOUNT">Fixed Amount</option>
+        </select>
+      </label>
+      <label>Value <input type="number" formControlName="discountValue" /></label>
+      <label>Minimum Order <input type="number" formControlName="minimumOrderAmount" /></label>
+      <label>Max Redemptions (total) <input type="number" formControlName="maxRedemptions" /></label>
+      <label>Max Per User <input type="number" formControlName="maxRedemptionsPerUser" /></label>
+      <label>Valid From <input type="date" formControlName="validFrom" /></label>
+      <label>Valid Until <input type="date" formControlName="validUntil" /></label>
+    </div>
+    <button type="submit" class="btn-primary">Create Coupon</button>
+  </form>
+}
+
+<table class="data-table card">
+  <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Redemptions</th><th>Valid Until</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    @for (c of coupons(); track c.id) {
+      <tr>
+        <td><strong>{{ c.code }}</strong></td>
+        <td>{{ c.discountType }}</td>
+        <td>{{ c.discountType === 'PERCENTAGE' ? c.discountValue + '%' : (c.discountValue | currency) }}</td>
+        <td>{{ c.redemptionsCount }} / {{ c.maxRedemptions ?? '∞' }}</td>
+        <td>{{ c.validUntil | date:'mediumDate' }}</td>
+        <td>{{ c.isActive ? 'Active' : 'Inactive' }}</td>
+        <td>
+          @if (c.isActive) {
+            <button type="button" class="link-btn" (click)="deactivate(c)">Deactivate</button>
+          }
+        </td>
+      </tr>
+    }
+    @if (coupons().length === 0) { <tr><td colspan="7">No coupons yet.</td></tr> }
+  </tbody>
+</table>

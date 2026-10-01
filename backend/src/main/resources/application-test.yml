@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:ecommerce_test;MODE=Oracle;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    # Oracle-specific SQL (SEQUENCE/TRIGGER syntax) in migrations does not run cleanly
+    # against H2 even in Oracle-compat mode. Tests that need real schema behavior
+    # should run against a Testcontainers Oracle XE instance instead (see backend/README).
+    enabled: false
+
+logging:
+  level:
+    root: WARN
+    com.tailoredplatform.ecommerce: INFO

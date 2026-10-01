@@ -1,0 +1,75 @@
+<h1>Categories &amp; Brands</h1>
+
+<div class="two-col">
+  <section>
+    <div class="header-row">
+      <h2>Categories</h2>
+      <button type="button" class="btn-primary" (click)="isCategoryFormOpen.set(!isCategoryFormOpen())">
+        {{ isCategoryFormOpen() ? 'Cancel' : '+ New' }}
+      </button>
+    </div>
+
+    @if (isCategoryFormOpen()) {
+      <form class="mini-form card" [formGroup]="categoryForm" (ngSubmit)="submitCategory()">
+        <label>Slug <input type="text" formControlName="slug" /></label>
+        <label>Name <input type="text" formControlName="name" /></label>
+        <label>Description <textarea formControlName="description" rows="2"></textarea></label>
+        <label>Image URL <input type="text" formControlName="imageUrl" /></label>
+        <label>Parent Category
+          <select formControlName="parentId">
+            <option [value]="null">None (top-level)</option>
+            @for (c of categories(); track c.id) { <option [value]="c.id">{{ c.name }}</option> }
+          </select>
+        </label>
+        <label>Display Order <input type="number" formControlName="displayOrder" /></label>
+        <button type="submit" class="btn-primary">Create Category</button>
+      </form>
+    }
+
+    <table class="data-table card">
+      <thead><tr><th>Name</th><th>Slug</th><th></th></tr></thead>
+      <tbody>
+        @for (c of categories(); track c.id) {
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.slug }}</td>
+            <td><button type="button" class="link-btn danger" (click)="deactivateCategory(c)">Deactivate</button></td>
+          </tr>
+        }
+        @if (categories().length === 0) { <tr><td colspan="3">No categories yet.</td></tr> }
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <div class="header-row">
+      <h2>Brands</h2>
+      <button type="button" class="btn-primary" (click)="isBrandFormOpen.set(!isBrandFormOpen())">
+        {{ isBrandFormOpen() ? 'Cancel' : '+ New' }}
+      </button>
+    </div>
+
+    @if (isBrandFormOpen()) {
+      <form class="mini-form card" [formGroup]="brandForm" (ngSubmit)="submitBrand()">
+        <label>Slug <input type="text" formControlName="slug" /></label>
+        <label>Name <input type="text" formControlName="name" /></label>
+        <label>Logo URL <input type="text" formControlName="logoUrl" /></label>
+        <button type="submit" class="btn-primary">Create Brand</button>
+      </form>
+    }
+
+    <table class="data-table card">
+      <thead><tr><th>Name</th><th>Slug</th><th></th></tr></thead>
+      <tbody>
+        @for (b of brands(); track b.id) {
+          <tr>
+            <td>{{ b.name }}</td>
+            <td>{{ b.slug }}</td>
+            <td><button type="button" class="link-btn danger" (click)="deactivateBrand(b)">Deactivate</button></td>
+          </tr>
+        }
+        @if (brands().length === 0) { <tr><td colspan="3">No brands yet.</td></tr> }
+      </tbody>
+    </table>
+  </section>
+</div>

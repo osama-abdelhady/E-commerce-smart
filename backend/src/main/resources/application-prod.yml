@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 25
+      minimum-idle: 5
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+  flyway:
+    baseline-on-migrate: false   # production schema must already be baselined deliberately
+
+logging:
+  level:
+    root: WARN
+    com.tailoredplatform.ecommerce: INFO
+  file:
+    name: /var/log/ecommerce-backend/application.log
+
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+
+app:
+  cors:
+    allowed-origins: ${PROD_FRONTEND_URL}
+  cookies:
+    secure: true

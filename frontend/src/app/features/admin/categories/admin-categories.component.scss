@@ -1,0 +1,12 @@
+:host { display: block; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 24px; }
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.header-row h2 { font-size: 1.1rem; margin: 0; }
+.mini-form { display: flex; flex-direction: column; gap: 10px; padding: 20px; margin-bottom: 16px; }
+.mini-form label { display: flex; flex-direction: column; gap: 4px; font-size: 0.8125rem; font-weight: 600; }
+.mini-form input, .mini-form select, .mini-form textarea { padding: 8px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-family: inherit; }
+.data-table { padding: 8px; }
+.link-btn { background: none; border: none; cursor: pointer; text-decoration: underline; font-size: 0.8125rem; }
+.link-btn.danger { color: var(--color-danger); }
+
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }

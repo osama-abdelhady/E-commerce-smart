@@ -1,0 +1,50 @@
+<h1>Dashboard</h1>
+
+@if (isLoading()) {
+  <p>Loading…</p>
+} @else if (summary(); as s) {
+  <div class="stat-grid">
+    <div class="stat-card card"><span class="label">Total Sales</span><span class="value">{{ s.totalSales | currency }}</span></div>
+    <div class="stat-card card"><span class="label">Total Orders</span><span class="value">{{ s.totalOrders }}</span></div>
+    <div class="stat-card card"><span class="label">Total Customers</span><span class="value">{{ s.totalCustomers }}</span></div>
+    <div class="stat-card card"><span class="label">Total Products</span><span class="value">{{ s.totalProducts }}</span></div>
+    <div class="stat-card card warn"><span class="label">Low Stock Items</span><span class="value">{{ s.lowStockCount }}</span></div>
+    <div class="stat-card card warn"><span class="label">Pending Orders</span><span class="value">{{ s.pendingOrdersCount }}</span></div>
+  </div>
+
+  <div class="panels">
+    <div class="panel card">
+      <div class="panel-header">
+        <h3>Recent Orders</h3>
+        <a routerLink="/admin/orders">View all →</a>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Order #</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead>
+        <tbody>
+          @for (o of s.recentOrders; track o.orderNumber) {
+            <tr>
+              <td>{{ o.orderNumber }}</td>
+              <td>{{ o.customerEmail }}</td>
+              <td><span class="status-pill" [class]="o.status.toLowerCase()">{{ o.status }}</span></td>
+              <td>{{ o.grandTotal | currency }}</td>
+            </tr>
+          }
+          @if (s.recentOrders.length === 0) { <tr><td colspan="4">No orders yet.</td></tr> }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel card">
+      <div class="panel-header"><h3>Best Sellers</h3></div>
+      <table class="data-table">
+        <thead><tr><th>Product</th><th>Reviews</th><th>Rating</th></tr></thead>
+        <tbody>
+          @for (p of s.bestSellers; track p.productName) {
+            <tr><td>{{ p.productName }}</td><td>{{ p.reviewCount }}</td><td>{{ p.averageRating }} ★</td></tr>
+          }
+          @if (s.bestSellers.length === 0) { <tr><td colspan="3">No best sellers marked yet.</td></tr> }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

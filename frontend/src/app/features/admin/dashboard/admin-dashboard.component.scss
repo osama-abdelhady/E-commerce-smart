@@ -1,0 +1,20 @@
+:host { display: block; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 24px 0 32px; }
+.stat-card { padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+.stat-card .label { font-size: 0.8rem; color: var(--color-text-muted); text-transform: uppercase; }
+.stat-card .value { font-size: 1.5rem; font-weight: 800; }
+.stat-card.warn .value { color: var(--color-accent); }
+
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.panel { padding: 20px; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.panel-header a { font-size: 0.8rem; }
+
+.status-pill { padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; background: var(--color-surface-alt); }
+.status-pill.pending { background: #fef3c7; color: #92400e; }
+.status-pill.confirmed, .status-pill.processing { background: #dbeafe; color: #1e40af; }
+.status-pill.shipped { background: #e0e7ff; color: #3730a3; }
+.status-pill.delivered { background: #dcfce7; color: #166534; }
+.status-pill.cancelled, .status-pill.refunded { background: #fee2e2; color: #991b1b; }
+
+@media (max-width: 900px) { .panels { grid-template-columns: 1fr; } }

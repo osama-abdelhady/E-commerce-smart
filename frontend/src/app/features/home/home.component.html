@@ -1,0 +1,60 @@
+<section class="hero">
+  <div class="page-container hero-inner">
+    <p class="eyebrow">New Season</p>
+    <h1>Tailoring that means business.</h1>
+    <p class="subhead">Precision-cut suits, shirts, and accessories — built for people who dress with intent.</p>
+    <a routerLink="/products" class="btn-primary">Shop the Collection</a>
+  </div>
+</section>
+
+<section class="page-container section">
+  <h2>Shop by Category</h2>
+  <div class="category-grid">
+    @for (cat of categories(); track cat.id) {
+      <a [routerLink]="['/categories', cat.slug]" class="category-tile">
+        @if (cat.imageUrl) {
+          <img [src]="cat.imageUrl" [alt]="cat.name" loading="lazy" />
+        } @else {
+          <div class="tile-placeholder"></div>
+        }
+        <span>{{ cat.name }}</span>
+      </a>
+    }
+  </div>
+</section>
+
+<section class="page-container section">
+  <div class="section-header">
+    <h2>Best Sellers</h2>
+    <a routerLink="/products" [queryParams]="{sortBy:'POPULARITY'}">View all &rarr;</a>
+  </div>
+  @if (isLoadingBestSellers()) {
+    <app-loading-skeleton variant="product-grid" [count]="8"></app-loading-skeleton>
+  } @else if (bestSellers().length === 0) {
+    <p class="muted">Best sellers will appear here once the catalog is populated.</p>
+  } @else {
+    <div class="product-grid">
+      @for (p of bestSellers(); track p.id) {
+        <app-product-card [product]="p" (wishlistToggled)="onWishlistToggle($event)"></app-product-card>
+      }
+    </div>
+  }
+</section>
+
+<section class="page-container section">
+  <div class="section-header">
+    <h2>New Arrivals</h2>
+    <a routerLink="/products" [queryParams]="{sortBy:'NEWEST'}">View all &rarr;</a>
+  </div>
+  @if (isLoadingNewArrivals()) {
+    <app-loading-skeleton variant="product-grid" [count]="8"></app-loading-skeleton>
+  } @else if (newArrivals().length === 0) {
+    <p class="muted">New arrivals will appear here once the catalog is populated.</p>
+  } @else {
+    <div class="product-grid">
+      @for (p of newArrivals(); track p.id) {
+        <app-product-card [product]="p" (wishlistToggled)="onWishlistToggle($event)"></app-product-card>
+      }
+    </div>
+  }
+</section>

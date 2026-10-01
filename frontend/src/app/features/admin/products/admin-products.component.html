@@ -1,0 +1,92 @@
+<div class="header-row">
+  <h1>Products</h1>
+  <button type="button" class="btn-primary" (click)="isFormOpen() ? isFormOpen.set(false) : openCreateForm()">
+    {{ isFormOpen() ? 'Cancel' : '+ New Product' }}
+  </button>
+</div>
+
+@if (isFormOpen()) {
+  <form class="product-form card" [formGroup]="form" (ngSubmit)="submit()">
+    <h3>{{ editingId() ? 'Edit Product' : 'New Product' }}</h3>
+
+    <div class="form-grid">
+      @if (!editingId()) {
+        <label>SKU <input type="text" formControlName="sku" /></label>
+        <label>Slug <input type="text" formControlName="slug" /></label>
+      }
+      <label class="span-2">Name <input type="text" formControlName="name" /></label>
+      <label class="span-2">Description <textarea formControlName="description" rows="2"></textarea></label>
+      <label>Price <input type="number" formControlName="price" /></label>
+      <label>Discount Price <input type="number" formControlName="discountPrice" /></label>
+      <label>Category
+        <select formControlName="categoryId">
+          <option [value]="null">Select a category</option>
+          @for (c of categories(); track c.id) { <option [value]="c.id">{{ c.name }}</option> }
+        </select>
+      </label>
+      <label>Brand
+        <select formControlName="brandId">
+          <option [value]="null">No brand</option>
+          @for (b of brands(); track b.id) { <option [value]="b.id">{{ b.name }}</option> }
+        </select>
+      </label>
+      @if (editingId()) {
+        <label>Status
+          <select formControlName="status">
+            <option value="DRAFT">Draft</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="ARCHIVED">Archived</option>
+          </select>
+        </label>
+      } @else {
+        <label>Primary Image URL <input type="text" formControlName="imageUrl" /></label>
+      }
+      <label class="checkbox-label"><input type="checkbox" formControlName="isBestSeller" /> Best Seller</label>
+      <label class="checkbox-label"><input type="checkbox" formControlName="isNewArrival" /> New Arrival</label>
+    </div>
+
+    @if (!editingId()) {
+      <h4>Variants</h4>
+      <div formArrayName="variants" class="variants-list">
+        @for (v of variants.controls; track $index; let i = $index) {
+          <div [formGroupName]="i" class="variant-row">
+            <input type="text" formControlName="sku" placeholder="Variant SKU" />
+            <input type="text" formControlName="size" placeholder="Size" />
+            <input type="text" formControlName="color" placeholder="Color" />
+            <input type="color" formControlName="colorHex" />
+            <input type="number" formControlName="priceOverride" placeholder="Price override" />
+            <input type="number" formControlName="initialQuantity" placeholder="Initial qty" />
+            <button type="button" class="link-btn" (click)="removeVariant(i)">Remove</button>
+          </div>
+        }
+      </div>
+      <button type="button" class="btn-secondary" (click)="addVariant()">+ Add Variant</button>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">{{ editingId() ? 'Save Changes' : 'Create Product' }}</button>
+    </div>
+  </form>
+}
+
+<table class="data-table card">
+  <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Price</th><th>Rating</th><th>Actions</th></tr></thead>
+  <tbody>
+    @for (p of products(); track p.id) {
+      <tr>
+        <td>{{ p.sku }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.categoryName }}</td>
+        <td>{{ (p.discountPrice ?? p.price) | currency }}</td>
+        <td>{{ p.averageRating }} ({{ p.reviewCount }})</td>
+        <td>
+          <button type="button" class="link-btn" (click)="openEditForm(p)">Edit</button>
+          <button type="button" class="link-btn danger" (click)="deactivate(p)">Deactivate</button>
+        </td>
+      </tr>
+    }
+    @if (products().length === 0) { <tr><td colspan="6">No products yet.</td></tr> }
+  </tbody>
+</table>
+<app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="onPageChange($event)"></app-pagination>

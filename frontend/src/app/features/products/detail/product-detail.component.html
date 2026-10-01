@@ -1,0 +1,156 @@
+@if (isLoading()) {
+  <div class="page-container detail-loading">
+    <app-loading-skeleton variant="block" style="height:480px;display:block;"></app-loading-skeleton>
+  </div>
+} @else if (!product()) {
+  <div class="page-container">
+    <p>Product not found.</p>
+    <a routerLink="/products">Back to shop</a>
+  </div>
+} @else {
+  <section class="page-container detail-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/">Home</a> / <a [routerLink]="['/categories', product()!.categorySlug]">{{ product()!.categoryName }}</a> / {{ product()!.name }}
+    </nav>
+
+    <div class="detail-grid">
+      <div class="gallery">
+        <div class="main-image">
+          @if (product()!.images.length) {
+            <img [src]="product()!.images[activeImageIndex()].url" [alt]="product()!.images[activeImageIndex()].altText ?? product()!.name" />
+          } @else {
+            <div class="image-placeholder"></div>
+          }
+        </div>
+        @if (product()!.images.length > 1) {
+          <div class="thumbnails">
+            @for (img of product()!.images; track img.id; let i = $index) {
+              <button type="button" [class.active]="i === activeImageIndex()" (click)="activeImageIndex.set(i)">
+                <img [src]="img.url" [alt]="img.altText ?? ''" />
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="info">
+        @if (product()!.brandName) { <span class="brand">{{ product()!.brandName }}</span> }
+        <h1>{{ product()!.name }}</h1>
+        <app-rating [value]="product()!.averageRating" [count]="product()!.reviewCount"></app-rating>
+
+        <div class="price-row">
+          <span class="price">{{ (product()!.discountPrice ?? product()!.price) | currency:product()!.currency }}</span>
+          @if (product()!.discountPrice) {
+            <span class="price-original">{{ product()!.price | currency:product()!.currency }}</span>
+          }
+        </div>
+
+        <p class="description">{{ product()!.description }}</p>
+
+        @if (product()!.availableColors.length) {
+          <div class="option-group">
+            <h4>Color</h4>
+            <div class="swatches">
+              @for (color of product()!.availableColors; track color) {
+                <button type="button" class="swatch" [class.active]="selectedColor() === color" (click)="selectColor(color)">{{ color }}</button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (product()!.availableSizes.length) {
+          <div class="option-group">
+            <h4>Size</h4>
+            <div class="swatches">
+              @for (size of product()!.availableSizes; track size) {
+                <button type="button" class="swatch" [class.active]="selectedSize() === size" (click)="selectSize(size)">{{ size }}</button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="stock-line">
+          @if (selectedVariant()?.inStock) {
+            <span class="in-stock">In stock ({{ selectedVariant()!.availableQuantity }} available)</span>
+          } @else {
+            <span class="out-stock">Out of stock for this selection</span>
+          }
+        </div>
+
+        <div class="quantity-row">
+          <button type="button" (click)="decrementQuantity()" aria-label="Decrease quantity">−</button>
+          <span>{{ quantity() }}</span>
+          <button type="button" (click)="incrementQuantity()" aria-label="Increase quantity">+</button>
+        </div>
+
+        <div class="action-row">
+          <button type="button" class="btn-primary" [disabled]="isAddingToCart() || !selectedVariant()?.inStock" (click)="addToCart()">
+            {{ isAddingToCart() ? 'Adding…' : 'Add to Cart' }}
+          </button>
+          <button type="button" class="btn-secondary wishlist-toggle" (click)="toggleWishlist()">
+            {{ isWishlisted() ? '♥ Wishlisted' : '♡ Add to Wishlist' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="reviews-section">
+      <div class="reviews-header">
+        <h2>Reviews ({{ product()!.reviewCount }})</h2>
+        @if (auth.isAuthenticated()) {
+          <button type="button" class="btn-secondary" (click)="isReviewFormOpen.set(!isReviewFormOpen())">Write a review</button>
+        }
+      </div>
+
+      @if (isReviewFormOpen()) {
+        <form class="review-form card" [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+          <label>
+            Order item ID (from your order history)
+            <input type="number" formControlName="orderItemId" />
+          </label>
+          <label>
+            Rating
+            <select formControlName="rating">
+              @for (n of [5,4,3,2,1]; track n) { <option [value]="n">{{ n }} stars</option> }
+            </select>
+          </label>
+          <label>
+            Title
+            <input type="text" formControlName="title" />
+          </label>
+          <label>
+            Review
+            <textarea formControlName="body" rows="3"></textarea>
+          </label>
+          <button type="submit" class="btn-primary">Submit Review</button>
+        </form>
+      }
+
+      @if (reviews().length === 0) {
+        <p class="muted">No reviews yet — be the first to leave one.</p>
+      } @else {
+        <div class="review-list">
+          @for (r of reviews(); track r.id) {
+            <div class="review-item card">
+              <app-rating [value]="r.rating" [showCount]="false"></app-rating>
+              @if (r.title) { <h5>{{ r.title }}</h5> }
+              <p>{{ r.body }}</p>
+              <span class="reviewer">{{ r.reviewerName }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    @if (relatedProducts().length) {
+      <section class="related-section">
+        <h2>You Might Also Like</h2>
+        <div class="product-grid">
+          @for (p of relatedProducts(); track p.id) {
+            <app-product-card [product]="p"></app-product-card>
+          }
+        </div>
+      </section>
+    }
+  </section>
+}

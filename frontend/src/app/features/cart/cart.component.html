@@ -1,0 +1,59 @@
+<section class="page-container cart-page">
+  <h1>Your Cart</h1>
+
+  @if (isLoading()) {
+    <app-loading-skeleton variant="text" [count]="4"></app-loading-skeleton>
+  } @else if (!cartService.cart() || cartService.cart()!.items.length === 0) {
+    <app-empty-state
+      title="Your cart is empty"
+      description="Looks like you haven't added anything yet."
+      actionLabel="Continue Shopping"
+      actionLink="/products"
+    ></app-empty-state>
+  } @else {
+    <div class="cart-layout">
+      <div class="cart-items">
+        @for (item of cartService.cart()!.items; track item.id) {
+          <div class="cart-item card">
+            @if (item.imageUrl) {
+              <img [src]="item.imageUrl" [alt]="item.productName" />
+            } @else {
+              <div class="img-placeholder"></div>
+            }
+            <div class="item-info">
+              <a [routerLink]="['/products', item.productSlug]" class="item-name">{{ item.productName }}</a>
+              <span class="variant">{{ item.color }} @if (item.color && item.size) { / } {{ item.size }}</span>
+              @if (item.priceChanged) {
+                <span class="price-warning">Price has changed since you added this item</span>
+              }
+              @if (!item.inStock) {
+                <span class="price-warning">Only {{ item.availableQuantity }} left in stock</span>
+              }
+              <span class="unit-price">{{ item.unitPrice | currency }}</span>
+            </div>
+            <div class="item-controls">
+              <div class="quantity-row">
+                <button type="button" (click)="updateQuantity(item.id, item.quantity - 1)" [disabled]="updatingItemId() === item.id">−</button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" (click)="updateQuantity(item.id, item.quantity + 1)" [disabled]="updatingItemId() === item.id">+</button>
+              </div>
+              <span class="line-total">{{ item.lineTotal | currency }}</span>
+              <button type="button" class="remove-btn" (click)="removeItem(item.id)" [disabled]="updatingItemId() === item.id">Remove</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <aside class="order-summary card">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ cartService.cart()!.subtotal | currency }}</span>
+        </div>
+        <p class="muted small">Shipping, tax, and any discount are calculated at checkout.</p>
+        <button type="button" class="btn-primary full-width" (click)="goToCheckout()">Proceed to Checkout</button>
+        <a routerLink="/products" class="continue-link">Continue Shopping</a>
+      </aside>
+    </div>
+  }
+</section>
